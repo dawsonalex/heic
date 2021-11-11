@@ -84,7 +84,6 @@ func (h *ImageHandle) Metadata(mID MetadataID) []byte {
 	keepAlive(h)
 
 	return C.GoBytes(data, C.int(nData))
-	//mExif.load(exifData+4, nData-4);
 }
 
 func (h *ImageHandle) ExifCount() int {
