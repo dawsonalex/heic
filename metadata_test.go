@@ -49,15 +49,13 @@ func TestExifCount(t *testing.T) {
 	fmt.Println("Metadata IDs", metadataIDs)
 
 	metadataID := metadataIDs[0]
-	//metadata := handle.Metadata(metadataID)
-	//fmt.Printf("Metadata %d: %s\n", metadataID, metadata)
 
-	// WORK IN PROGRESS
-
-	props, err := handle.MetadataMap(metadataID)
+	props, err := handle.AppleTime(metadataID)
 	if err != nil {
 		t.Fail()
 	}
+
+	// WORK IN PROGRESS
 
 	pp.Print(props)
 
