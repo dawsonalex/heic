@@ -17,7 +17,6 @@ package heic
  * along with heif.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /*
 #cgo pkg-config: libheif
 #include <libheif/heif.h>

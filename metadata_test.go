@@ -56,8 +56,6 @@ func TestExifCount(t *testing.T) {
 	}
 	pp.Print(times)
 
-	return
-
 	thumbnail := false
 
 	handle.GetWidth()
