@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path"
 	"testing"
+
+	"github.com/k0kubun/pp"
 )
 
 func TestExifCount(t *testing.T) {
@@ -45,6 +47,21 @@ func TestExifCount(t *testing.T) {
 
 	metadataIDs := handle.MetadataIDs()
 	fmt.Println("Metadata IDs", metadataIDs)
+
+	metadataID := metadataIDs[0]
+	//metadata := handle.Metadata(metadataID)
+	//fmt.Printf("Metadata %d: %s\n", metadataID, metadata)
+
+	// WORK IN PROGRESS
+
+	props, err := handle.MetadataMap(metadataID)
+	if err != nil {
+		t.Fail()
+	}
+
+	pp.Print(props)
+
+	return
 
 	thumbnail := false
 
