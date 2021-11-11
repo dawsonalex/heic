@@ -23,11 +23,11 @@ func (h *ImageHandle) MetadataIDs() []MetadataID {
 	}
 	meta := make([]C.uint, nMeta)
 	C.heif_image_handle_get_list_of_metadata_block_IDs(h.handle, nil, &meta[0], C.int(nMeta))
+	keepAlive(h)
 	metaDataIDs := make([]MetadataID, nMeta)
 	for i := 0; i < nMeta; i++ {
 		metaDataIDs[i] = MetadataID(meta[i])
 	}
-	keepAlive(h)
 	return metaDataIDs
 }
 
@@ -46,10 +46,10 @@ func (h *ImageHandle) ExifIDs() []MetadataID {
 	filter := C.CString("Exif")
 	meta := make([]C.uint, nMeta)
 	C.heif_image_handle_get_list_of_metadata_block_IDs(h.handle, filter, &meta[0], C.int(nMeta))
+	keepAlive(h)
 	metaDataIDs := make([]MetadataID, nMeta)
 	for i := 0; i < nMeta; i++ {
 		metaDataIDs[i] = MetadataID(meta[i])
 	}
-	keepAlive(h)
 	return metaDataIDs
 }
