@@ -50,14 +50,11 @@ func TestExifCount(t *testing.T) {
 
 	metadataID := metadataIDs[0]
 
-	props, err := handle.AppleTime(metadataID)
+	times, err := handle.ImageTimes(metadataID)
 	if err != nil {
 		t.Fail()
 	}
-
-	// WORK IN PROGRESS
-
-	pp.Print(props)
+	pp.Print(times)
 
 	return
 

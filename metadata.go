@@ -12,6 +12,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"errors"
+	"math"
+	"time"
 	"unsafe"
 
 	"github.com/antchfx/xmlquery"
@@ -19,7 +21,13 @@ import (
 	"howett.net/plist"
 )
 
-type MetadataID uint
+type (
+	// MetadataID contains an uint that represents the ID of a block of metadata
+	MetadataID uint
+
+	// ImageTimeTable maps from image index to a time.Time that contains the hour and minute for a dynamic wallpaper image
+	ImageTimeTable []time.Time
+)
 
 func (h *ImageHandle) MetadataCount() int {
 	n := int(C.heif_image_handle_get_number_of_metadata_blocks(h.handle, nil))
@@ -118,10 +126,68 @@ func (h *ImageHandle) MetadataMap(mID MetadataID, xs string) (map[string]interfa
 	return decodedMap, nil
 }
 
-func (h *ImageHandle) AppleTime(mID MetadataID) (map[string]interface{}, error) {
+func (h *ImageHandle) AppleTimesMap(mID MetadataID) (map[string]interface{}, error) {
 	return h.MetadataMap(mID, "string(//x:xmpmeta/rdf:RDF/rdf:Description/@apple_desktop:h24)")
 }
 
-func (h *ImageHandle) AppleSolar(mID MetadataID) (map[string]interface{}, error) {
+func (h *ImageHandle) AppleSolarMap(mID MetadataID) (map[string]interface{}, error) {
 	return h.MetadataMap(mID, "string(//x:xmpmeta/rdf:RDF/rdf:Description/@apple_desktop:solar)")
 }
+
+// ImageTimes returns the image times for a dynamic wallpaper.
+func (h *ImageHandle) ImageTimes(mID MetadataID) (ImageTimeTable, error) {
+	m, err := h.AppleTimesMap(mID)
+	if err != nil {
+		return nil, err
+	}
+
+	// m["ap"] is ignored for now. It should have an "l" and "d" key but it's unclear what those might be.
+	// Perhaps longitude and latitude?
+
+	tiMapList, found := m["ti"]
+	if !found {
+		return nil, err
+	}
+	tii, ok := tiMapList.([]interface{})
+	if !ok {
+		return nil, errors.New("unusual apple_desktop:h24 metadata")
+	}
+	imageTimes := make(ImageTimeTable, len(tii))
+	for _, tiMap := range tii {
+		tiMapMap, ok := tiMap.(map[string]interface{})
+		if !ok {
+			return nil, errors.New("unusual apple_desktop:h24 metadata")
+		}
+		iDuck, ok := tiMapMap["i"]
+		if !ok {
+			return nil, errors.New("unusual apple_desktop:h24 metadata")
+		}
+		tDuck, ok := tiMapMap["t"]
+		if !ok {
+			return nil, errors.New("unusual apple_desktop:h24 metadata")
+		}
+		iValue, ok := iDuck.(uint64)
+		if !ok {
+			return nil, errors.New("unusual apple_desktop:h24 metadata")
+		}
+		tValue, ok := tDuck.(float64)
+		if !ok {
+			return nil, errors.New("unusual apple_desktop:h24 metadata")
+		}
+		imageIndex := iValue
+		imageHourFloat := tValue * 24.0
+		imageHourInt := int(math.Floor(imageHourFloat))
+		imageMinuteFloat := (imageHourFloat - float64(imageHourInt)) * 60.0
+		imageMinuteInt := int(math.Floor(imageMinuteFloat))
+
+		// Generate a time.Time that contains the correct hour and minute
+		now := time.Now()
+		timeWithHourAndMinute := time.Date(now.Year(), now.Month(), now.Day(), imageHourInt, imageMinuteInt, 0, 0, now.Location())
+
+		// For the found imageIndex, set the time.Time
+		imageTimes[imageIndex] = timeWithHourAndMinute
+	}
+	return imageTimes, nil
+}
+
+// TODO: Also create a function that pulls out contents from the results of AppleSolarMap

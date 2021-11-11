@@ -29,7 +29,7 @@ import (
 	"testing"
 )
 
-func testGetVersion(t *testing.T) {
+func TestGetVersion(t *testing.T) {
 	version := GetVersion()
 	if version == "" {
 		t.Fatal("Version is missing")
