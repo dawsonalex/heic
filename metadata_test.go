@@ -37,11 +37,14 @@ func TestExifCount(t *testing.T) {
 	exifCount := handle.ExifCount()
 	fmt.Println("Exif count", exifCount)
 
-	metaDataCount := handle.MetaDataCount()
-	fmt.Println("Metadata count", metaDataCount)
+	exifIDs := handle.ExifIDs()
+	fmt.Println("Exif IDs", exifIDs)
 
-	metaDataIDs := handle.MetaDataIDs()
-	fmt.Println("Metadata IDs", metaDataIDs)
+	metadataCount := handle.MetadataCount()
+	fmt.Println("Metadata count", metadataCount)
+
+	metadataIDs := handle.MetadataIDs()
+	fmt.Println("Metadata IDs", metadataIDs)
 
 	thumbnail := false
 
