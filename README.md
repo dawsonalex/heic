@@ -15,7 +15,7 @@ if len(metadataIDs) > 0 {
 }
 ```
 
-Take a look at 
+Take a look at `metadata_test.go` for a full example.
 
 ## General info
 
