@@ -1,4 +1,4 @@
-module github.com/xyproto/heic
+module github.com/dawsonalex/heic
 
 go 1.17
 
